@@ -5,7 +5,6 @@
         <p>Score : {{ score }}</p>
         <!-- <input class="userInput" @input="checkInput" v-if="gameStarted" /> -->
         <input class="userInput" v-model="userInput" @input="checkInput" ref="userInput">
-
         <button class="start-stop" @click="startGame">{{ gameStarted ? 'Stop' : 'Start' }}</button>
         <div class="keyboard">
             <div v-for="(row, rowIndex) in keyboard" :key="'row' + rowIndex">

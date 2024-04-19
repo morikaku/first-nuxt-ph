@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <h1>タイピングゲーム</h1>
+        <h1>Typing Game</h1>
         <p v-if="gameStarted">currentWord : {{ currentWord }}</p>
         <p>Score : {{ score }}</p>
         <input v-model="userInput" @input="checkInput" v-if="gameStarted" />
@@ -19,7 +19,7 @@
 export default {
     data() {
         return {
-            words: ['apple', 'banana', 'cherry', 'date', 'elderberry'],
+            words: ['apple', 'banana', 'cherry', 'date', 'strawberry'],
             currentWord: '',
             userInput: '',
             score: 0,
@@ -31,7 +31,17 @@ export default {
             ].map(row => row.map(letter => ({ letter, active: false })))
         }
     },
+    mounted() {
+        window.addEventListener('keydown', this.keydownHandler);
+        window.addEventListener('keyup', this.keyupHandler);
+    },
+    beforeDestroy() {
+        window.removeEventListener('keydown', this.keydownHandler);
+        window.removeEventListener('keyup', this.keyupHandler);
+    },
     methods: {
+        // 省略
+
         startGame() {
             this.gameStarted = true;
             this.score = 0;
@@ -51,6 +61,14 @@ export default {
             this.keyboard.forEach(key => {
                 key.active = this.userInput.includes(key.letter);
             });
+        },
+        keydownHandler(e) {
+            const key = this.keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
+            if (key) key.active = true;
+        },
+        keyupHandler(e) {
+            const key = this.keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
+            if (key) key.active = false;
         }
     }
 }

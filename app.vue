@@ -1,5 +1,7 @@
+
+import type { NuxtPage } from '#build/components';
 <template>
   <div>
-    <NuxtWelcome />
+    <NuxtPage />
   </div>
 </template>

@@ -6,7 +6,11 @@
         <input class="userInput" v-model="userInput" @input="checkInput" ref="userInput" v-if="gameStarted" />
         <button class="start-stop" @click="startGame">{{ gameStarted ? 'Stop' : 'Start' }}</button>
         <div class="keyboard">
-            <div v-for="(row, rowIndex) in keyboard" :key="'row' + rowIndex"></div>
+            <div v-for="(row, rowIndex) in keyboard" :key="'row' + rowIndex">
+                <div v-for="key in row" :key="key.letter" :class="{ 'active': key.active }">
+                    {{ key.letter }}
+                </div>
+            </div>
             <div v-for="key in row" :key="key.letter" :class="{ 'active': key.active }">
                 {{ key.letter }}
             </div>
@@ -93,86 +97,6 @@ export default {
             checkInput
         };
     }
-}
-</script>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
-
-export default {
-setup() {
-const words = ['apple', 'banana', 'cherry', 'date', 'strawberry'];
-const currentWord = ref('');
-const userInput = ref('');
-const score = ref(0);
-const gameStarted = ref(false);
-const keyboard = reactive([
-['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-['z', 'x', 'c', 'v', 'b', 'n', 'm']
-].map(row => row.map(letter => ({ letter, active: false }))));
-
-const startGame = () => {
-if (gameStarted.value) {
-// Reset the game
-currentWord.value = '';
-userInput.value = '';
-score.value = 0;
-keyboard.forEach(row => row.forEach(key => key.active = false));
-gameStarted.value = false; // Stop the game
-} else {
-// Start the game
-gameStarted.value = true;
-score.value = 0;
-userInput.value = '';
-pickNewWord();
-}
-};
-
-const pickNewWord = () => {
-const randomIndex = Math.floor(Math.random() * words.length);
-currentWord.value = words[randomIndex];
-};
-
-const checkInput = () => {
-if (userInput.value === currentWord.value) {
-score.value++;
-userInput.value = '';
-pickNewWord();
-}
-keyboard.forEach(key => {
-key.active = userInput.value.includes(key.letter);
-});
-};
-
-const keydownHandler = (e) => {
-const key = keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
-if (key) key.active = true;
-};
-
-const keyupHandler = (e) => {
-const key = keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
-if (key) key.active = false;
-};
-
-onMounted(() => {
-window.addEventListener('keydown', keydownHandler);
-window.addEventListener('keyup', keyupHandler);
-});
-
-onBeforeUnmount(() => {
-window.removeEventListener('keydown', keydownHandler);
-window.removeEventListener('keyup', keyupHandler);
-});
-
-return {
-currentWord,
-userInput,
-score,
-gameStarted,
-keyboard,
-startGame,
-checkInput
-};
-}
 }
 </script>
 

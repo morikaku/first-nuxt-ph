@@ -3,87 +3,176 @@
         <h1>Typing Game</h1>
         <p v-if="gameStarted">CurrentWord : {{ currentWord }}</p>
         <p>Score : {{ score }}</p>
-        <!-- <input class="userInput" @input="checkInput" v-if="gameStarted" /> -->
-        <input class="userInput" v-model="userInput" @input="checkInput" ref="userInput">
+        <input class="userInput" v-model="userInput" @input="checkInput" ref="userInput" v-if="gameStarted" />
         <button class="start-stop" @click="startGame">{{ gameStarted ? 'Stop' : 'Start' }}</button>
         <div class="keyboard">
-            <div v-for="(row, rowIndex) in keyboard" :key="'row' + rowIndex">
-                <div v-for="key in row" :key="key.letter" :class="{ 'active': key.active }">
-                    {{ key.letter }}
-                </div>
+            <div v-for="(row, rowIndex) in keyboard" :key="'row' + rowIndex"></div>
+            <div v-for="key in row" :key="key.letter" :class="{ 'active': key.active }">
+                {{ key.letter }}
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
+
 export default {
-    data() {
-        return {
-            words: ['apple', 'banana', 'cherry', 'date', 'strawberry'],
-            currentWord: '',
-            userInput: '',
-            score: 0,
-            gameStarted: false,
-            keyboard: [
-                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-                ['z', 'x', 'c', 'v', 'b', 'n', 'm']
-            ].map(row => row.map(letter => ({ letter, active: false })))
-        }
-    },
-    mounted() {
-        window.addEventListener('keydown', this.keydownHandler);
-        window.addEventListener('keyup', this.keyupHandler);
-    },
-    beforeDestroy() {
-        window.removeEventListener('keydown', this.keydownHandler);
-        window.removeEventListener('keyup', this.keyupHandler);
-    },
-    methods: {
-        startGame() {
-            if (this.gameStarted) {
+    setup() {
+        const words = ['apple', 'banana', 'cherry', 'date', 'strawberry'];
+        const currentWord = ref('');
+        const userInput = ref('');
+        const score = ref(0);
+        const gameStarted = ref(false);
+        const keyboard = reactive([
+            ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+            ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+            ['z', 'x', 'c', 'v', 'b', 'n', 'm']
+        ].map(row => row.map(letter => ({ letter, active: false }))));
+
+        const startGame = () => {
+            if (gameStarted.value) {
                 // Reset the game
-                this.currentWord = '';
-                this.userInput = '';
-                this.score = 0;
-                this.keyboard.forEach(row => row.forEach(key => key.active = false));
-                this.gameStarted = false; // Stop the game
+                currentWord.value = '';
+                userInput.value = '';
+                score.value = 0;
+                keyboard.forEach(row => row.forEach(key => key.active = false));
+                gameStarted.value = false; // Stop the game
             } else {
                 // Start the game
-                this.gameStarted = true;
-                this.$nextTick(() => {
-                    this.$refs.userInput.focus(); // Add this line
-                });
+                gameStarted.value = true;
+                score.value = 0;
+                userInput.value = '';
+                pickNewWord();
+            }
+        };
 
-                this.score = 0;
-                this.userInput = '';
-                this.pickNewWord();
+        const pickNewWord = () => {
+            const randomIndex = Math.floor(Math.random() * words.length);
+            currentWord.value = words[randomIndex];
+        };
+
+        const checkInput = () => {
+            if (userInput.value === currentWord.value) {
+                score.value++;
+                userInput.value = '';
+                pickNewWord();
             }
-        },
-        pickNewWord() {
-            const randomIndex = Math.floor(Math.random() * this.words.length);
-            this.currentWord = this.words[randomIndex];
-        },
-        checkInput() {
-            if (this.userInput === this.currentWord) {
-                this.score++;
-                this.userInput = '';
-                this.pickNewWord();
-            }
-            this.keyboard.forEach(key => {
-                key.active = this.userInput.includes(key.letter);
+            keyboard.forEach(key => {
+                key.active = userInput.value.includes(key.letter);
             });
-        },
-        keydownHandler(e) {
-            const key = this.keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
+        };
+
+        const keydownHandler = (e) => {
+            const key = keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
             if (key) key.active = true;
-        },
-        keyupHandler(e) {
-            const key = this.keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
+        };
+
+        const keyupHandler = (e) => {
+            const key = keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
             if (key) key.active = false;
-        }
+        };
+
+        onMounted(() => {
+            window.addEventListener('keydown', keydownHandler);
+            window.addEventListener('keyup', keyupHandler);
+        });
+
+        onBeforeUnmount(() => {
+            window.removeEventListener('keydown', keydownHandler);
+            window.removeEventListener('keyup', keyupHandler);
+        });
+
+        return {
+            currentWord,
+            userInput,
+            score,
+            gameStarted,
+            keyboard,
+            startGame,
+            checkInput
+        };
     }
+}
+</script>
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
+
+export default {
+setup() {
+const words = ['apple', 'banana', 'cherry', 'date', 'strawberry'];
+const currentWord = ref('');
+const userInput = ref('');
+const score = ref(0);
+const gameStarted = ref(false);
+const keyboard = reactive([
+['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+['z', 'x', 'c', 'v', 'b', 'n', 'm']
+].map(row => row.map(letter => ({ letter, active: false }))));
+
+const startGame = () => {
+if (gameStarted.value) {
+// Reset the game
+currentWord.value = '';
+userInput.value = '';
+score.value = 0;
+keyboard.forEach(row => row.forEach(key => key.active = false));
+gameStarted.value = false; // Stop the game
+} else {
+// Start the game
+gameStarted.value = true;
+score.value = 0;
+userInput.value = '';
+pickNewWord();
+}
+};
+
+const pickNewWord = () => {
+const randomIndex = Math.floor(Math.random() * words.length);
+currentWord.value = words[randomIndex];
+};
+
+const checkInput = () => {
+if (userInput.value === currentWord.value) {
+score.value++;
+userInput.value = '';
+pickNewWord();
+}
+keyboard.forEach(key => {
+key.active = userInput.value.includes(key.letter);
+});
+};
+
+const keydownHandler = (e) => {
+const key = keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
+if (key) key.active = true;
+};
+
+const keyupHandler = (e) => {
+const key = keyboard.flat().find(key => key.letter.toLowerCase() === e.key.toLowerCase());
+if (key) key.active = false;
+};
+
+onMounted(() => {
+window.addEventListener('keydown', keydownHandler);
+window.addEventListener('keyup', keyupHandler);
+});
+
+onBeforeUnmount(() => {
+window.removeEventListener('keydown', keydownHandler);
+window.removeEventListener('keyup', keyupHandler);
+});
+
+return {
+currentWord,
+userInput,
+score,
+gameStarted,
+keyboard,
+startGame,
+checkInput
+};
+}
 }
 </script>
 
@@ -94,7 +183,6 @@ export default {
     align-items: center;
     margin: 50px auto 50px;
 }
-
 
 .userInput {
     width: 200px;
@@ -127,7 +215,6 @@ export default {
     text-align: center;
     padding: 10px;
     margin: 5px;
-    /* border: 1px solid #000; */
     border-radius: 10px;
     color: #fff;
     background-color: #ccc;

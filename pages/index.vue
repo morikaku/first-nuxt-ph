@@ -115,9 +115,9 @@ export default {
 .keyboard div {
     display: flex;
     flex-wrap: wrap;
-    padding: 10px;
+    padding: 5px;
     margin: 5px;
-    border: 1px solid #000;
+    border: 1px solid #eee;
     border-radius: 8px;
 }
 
@@ -125,9 +125,12 @@ export default {
     display: block;
     width: 20px;
     text-align: center;
+    padding: 10px;
     margin: 5px;
-    border: 1px solid #000;
-    border-radius: 8px;
+    /* border: 1px solid #000; */
+    border-radius: 10px;
+    color: #fff;
+    background-color: #ccc;
 }
 
 .keyboard .active {

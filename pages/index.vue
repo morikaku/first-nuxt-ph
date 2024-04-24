@@ -1,8 +1,8 @@
 <template>
     <div class="container">
-        <h1>Typing Game</h1>
+        <h1 class="title">Typing Game</h1>
         <p v-if="gameStarted">CurrentWord : {{ currentWord }}</p>
-        <p>Score : {{ score }}</p>
+        <p class="score">Score : {{ score }}</p>
         <input class="userInput" v-model="userInput" @input="checkInput" ref="userInput" v-if="gameStarted" />
         <button class="start-stop" @click="startGame">{{ gameStarted ? 'Stop' : 'Start' }}</button>
         <div class="keyboard">
@@ -20,10 +20,10 @@
 
 <script>
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
+import words from '@/data/words.js';
 
 export default {
     setup() {
-        const words = ['apple', 'banana', 'cherry', 'date', 'strawberry'];
         const currentWord = ref('');
         const userInput = ref('');
         const score = ref(0);
@@ -106,6 +106,15 @@ export default {
     flex-direction: column;
     align-items: center;
     margin: 50px auto 50px;
+}
+
+.title {
+    color: #99f;
+}
+
+.score {
+    color: #99f;
+    font-weight: bold;
 }
 
 .userInput {

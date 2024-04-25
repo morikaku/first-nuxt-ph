@@ -1,18 +1,16 @@
 <template>
     <div class="container">
         <h1 class="title">Typing Game</h1>
-        <p v-if="gameStarted">CurrentWord : {{ currentWord }}</p>
+        <p>CurrentWord : {{ currentWord }}</p>
         <p class="score">Score : {{ score }}</p>
-        <input class="userInput" v-model="userInput" @input="checkInput" ref="userInput" v-if="gameStarted" />
+        <!-- <input class="userInput" v-model="userInput.value" @input="checkInput" ref="userInput" /> -->
+        <input class="userInput" v-model="userInput" @input="checkInput" ref="userInputRef">
         <button class="start-stop" @click="startGame">{{ gameStarted ? 'Stop' : 'Start' }}</button>
         <div class="keyboard">
             <div v-for="(row, rowIndex) in keyboard" :key="'row' + rowIndex">
                 <div v-for="key in row" :key="key.letter" :class="{ 'active': key.active }">
                     {{ key.letter }}
                 </div>
-            </div>
-            <div v-for="key in row" :key="key.letter" :class="{ 'active': key.active }">
-                {{ key.letter }}
             </div>
         </div>
     </div>
@@ -26,6 +24,7 @@ export default {
     setup() {
         const currentWord = ref('');
         const userInput = ref('');
+        const userInputRef = ref(null);
         const score = ref(0);
         const gameStarted = ref(false);
         const keyboard = reactive([
@@ -47,6 +46,10 @@ export default {
                 gameStarted.value = true;
                 score.value = 0;
                 userInput.value = '';
+                // Set focus to userInput
+                nextTick(() => {
+                    userInputRef.value.focus();
+                });
                 pickNewWord();
             }
         };
@@ -94,7 +97,8 @@ export default {
             gameStarted,
             keyboard,
             startGame,
-            checkInput
+            checkInput,
+            userInputRef
         };
     }
 }
